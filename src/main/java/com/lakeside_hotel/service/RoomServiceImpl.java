@@ -1,8 +1,11 @@
 package com.lakeside_hotel.service;
 
+import com.lakeside_hotel.exception.InternalServerException;
 import com.lakeside_hotel.exception.ResourceNotFoundException;
 import com.lakeside_hotel.model.Room;
 import com.lakeside_hotel.repository.RoomRepository;
+import com.lakeside_hotel.response.RoomResponse;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,11 +68,33 @@ public class RoomServiceImpl implements IRoomService {
 
 	@Override
 	public void deleteRoom(Long roomId) {
-	
-		Optional<Room> theRoom= roomRepository.findById(roomId);
-		if(theRoom.isPresent()) {
+
+		Optional<Room> theRoom = roomRepository.findById(roomId);
+		if (theRoom.isPresent()) {
 			roomRepository.deleteById(roomId);
 		}
+	}
+
+	@Override
+	public Room updateRoom(Long roomId, String roomType, BigDecimal roomPrice, byte[] photoBytes) {
+		Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Room Not Found"));
+		if(roomType !=null) room.setRoomType(roomType);
+		
+		if(roomPrice!=null) room.setRoomPrice(roomPrice);
+		if(photoBytes!=null && photoBytes.length > 0) {
+			try {
+				room.setPhoto(new SerialBlob(photoBytes));
+			} catch (SQLException e) {
+				throw new InternalServerException("Error updating room");
+			}
+		}
+		return roomRepository.save(room);
+	}
+
+	@Override
+	public Optional<Room> getRoomById(Long roomId) {
+		// TODO Auto-generated method stub
+		return Optional.of(roomRepository.findById(roomId).get());
 	}
 
 }
