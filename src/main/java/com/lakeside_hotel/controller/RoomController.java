@@ -7,6 +7,7 @@ import com.lakeside_hotel.model.Room;
 import com.lakeside_hotel.response.BookingResponse;
 import com.lakeside_hotel.response.RoomResponse;
 import com.lakeside_hotel.service.BookingService;
+import com.lakeside_hotel.service.IBookingService;
 import com.lakeside_hotel.service.IRoomService;
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +42,7 @@ public class RoomController {
 	@Autowired
 	private IRoomService roomService;
 	@Autowired
-	private final BookingService bookingService;
+	private final IBookingService bookingService;
 
 	@PostMapping("/add/new-room")
 	public ResponseEntity<RoomResponse> addNewRoom(@RequestParam("photo") MultipartFile photo,
@@ -96,7 +97,7 @@ public class RoomController {
 		return ResponseEntity.ok(roomResponse);
 
 	}
-	@GetMapping("/room/${roomId}")
+	@GetMapping("/room/{roomId}")
 	public ResponseEntity<Optional<RoomResponse>> getRoomById(@PathVariable Long roomId){
 		Optional<Room> theRoom= roomService.getRoomById(roomId);
 		return theRoom.map(room-> {
@@ -125,6 +126,6 @@ public class RoomController {
 
 	private List<BookedRoom> getAllBookingsByRoomId(Long roomId) {
 
-		return bookingService.getAllBookingServiceById(roomId);
+		return bookingService.getAllBookingByRoomId(roomId);
 	}
 }
